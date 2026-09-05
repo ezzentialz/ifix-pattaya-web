@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iFix Pattaya — ซ่อมจอ เปลี่ยนแบต รับซื้อซาก iPhone</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   :root{
@@ -44,8 +44,6 @@
     to{background-position:-400px 0;}
   }
 
-  .reveal{opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease;}
-  .reveal.in-view{opacity:1; transform:translateY(0);}
   .reveal-stagger.in-view > *{animation:fadeUp .6s ease both;}
   .reveal-stagger.in-view > *:nth-child(1){animation-delay:.03s;}
   .reveal-stagger.in-view > *:nth-child(2){animation-delay:.12s;}
@@ -53,7 +51,7 @@
   .reveal-stagger.in-view > *:nth-child(4){animation-delay:.30s;}
 
   @media (prefers-reduced-motion: reduce){
-    .reveal, .reveal-stagger > *{opacity:1 !important; transform:none !important; animation:none !important; transition:none !important;}
+    .reveal-stagger > *{opacity:1 !important; transform:none !important; animation:none !important; transition:none !important;}
     .float, .pan-bg, .draw-line{animation:none !important;}
   }
   body{
@@ -64,10 +62,10 @@
     font-size:16px;
   }
   h1,h2,h3,.display{
-    font-family:'Chakra Petch','IBM Plex Sans Thai', sans-serif;
-    font-weight:600;
-    line-height:1.25;
-    letter-spacing:0.2px;
+    font-family:'IBM Plex Sans Thai', sans-serif;
+    font-weight:700;
+    line-height:1.4;
+    letter-spacing:0;
   }
   a{color:inherit; text-decoration:none;}
   img,svg{display:block; max-width:100%;}
@@ -94,7 +92,46 @@
     background:var(--steel-deep); color:#fff; padding:9px 18px; border-radius:999px;
     font-size:0.92rem; font-weight:500; white-space:nowrap;
   }
-  @media (max-width:720px){ nav{display:none;} }
+  a:focus-visible, button:focus-visible, .tier-cta:focus-visible{
+    outline:2px solid var(--sunset); outline-offset:3px; border-radius:4px;
+  }
+
+  /* ===== Mobile nav ===== */
+  .nav-toggle{
+    display:none; width:44px; height:44px; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--line); border-radius:8px; color:var(--ink);
+    cursor:pointer; flex-shrink:0;
+  }
+  .nav-toggle svg{width:20px; height:20px;}
+  .mobile-nav{
+    display:none; flex-direction:column; padding:6px 28px 18px;
+    border-top:1px solid var(--line); background:var(--paper);
+  }
+  .mobile-nav a{
+    padding:14px 4px; font-size:1rem; color:var(--ink);
+    border-bottom:1px solid var(--line); min-height:44px; display:flex; align-items:center;
+  }
+  .mobile-nav a:last-child{border-bottom:none;}
+  header.nav-open .mobile-nav{display:flex;}
+  @media (max-width:720px){
+    nav{display:none;}
+    .nav-toggle{display:inline-flex;}
+  }
+  @media (min-width:721px){ .mobile-nav{display:none !important;} }
+
+  /* ===== Sticky mobile call bar ===== */
+  .mobile-call-bar{ display:none; }
+  @media (max-width:720px){
+    .mobile-call-bar{
+      display:flex; position:fixed; left:0; right:0; bottom:0; z-index:60;
+      background:var(--sunset); color:#fff; text-align:center; justify-content:center;
+      align-items:center; gap:8px; font-weight:600; font-size:1rem;
+      padding:15px 20px calc(15px + env(safe-area-inset-bottom));
+      box-shadow:0 -6px 20px rgba(0,0,0,0.35);
+    }
+    .mobile-call-bar svg{width:18px; height:18px; flex-shrink:0;}
+    body{ padding-bottom:64px; }
+  }
 
   /* ===== Hero ===== */
   .hero{
@@ -106,7 +143,53 @@
       var(--paper);
   }
   .hero-circuit{
+    position:absolute; inset:0; z-index:1; opacity:0.5; pointer-events:none;
+  }
+  .hero-nebula{
     position:absolute; inset:0; z-index:0; opacity:0.5; pointer-events:none;
+  }
+  .hero-nebula canvas{ display:block; width:100%; height:100%; }
+  @media (prefers-reduced-motion: reduce){ .hero-nebula{ display:none; } }
+
+  /* ===== Lamp effect (top beam + fanning light cones) ===== */
+  @keyframes lampGrowLine{ from{ width:9rem; opacity:0; } to{ width:22rem; opacity:0.85; } }
+  @keyframes lampGrowCone{ from{ width:9rem; opacity:0; } to{ width:19rem; opacity:0.6; } }
+  @keyframes lampGrowCore{ from{ opacity:0; transform:translateX(-50%) scale(0.7); } to{ opacity:0.55; transform:translateX(-50%) scale(1); } }
+  .hero-lamp{
+    position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  }
+  .lamp-core{
+    position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:22rem; height:150px; border-radius:999px;
+    background:var(--steel); filter:blur(64px);
+    animation:lampGrowCore 1s cubic-bezier(.16,1,.3,1) .2s both;
+  }
+  .lamp-line{
+    position:absolute; top:18px; left:50%; transform:translateX(-50%);
+    height:2px; background:var(--steel);
+    box-shadow:0 0 24px 3px var(--steel);
+    animation:lampGrowLine 1s cubic-bezier(.16,1,.3,1) .3s both;
+  }
+  .lamp-cone{
+    position:absolute; top:0; height:230px;
+    filter:blur(5px);
+    -webkit-mask-image:linear-gradient(to bottom, black, transparent);
+            mask-image:linear-gradient(to bottom, black, transparent);
+    animation:lampGrowCone 1s cubic-bezier(.16,1,.3,1) .3s both;
+  }
+  .lamp-cone-left{
+    right:50%; clip-path:polygon(100% 0, 0 0, 42% 100%, 100% 100%);
+    background:linear-gradient(100deg, var(--steel), transparent 72%);
+  }
+  .lamp-cone-right{
+    left:50%; clip-path:polygon(0 0, 100% 0, 58% 100%, 0 100%);
+    background:linear-gradient(260deg, var(--steel), transparent 72%);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .lamp-core, .lamp-line, .lamp-cone{ animation:none; }
+    .lamp-line{ width:22rem; opacity:0.85; }
+    .lamp-cone{ width:19rem; opacity:0.6; }
+    .lamp-core{ opacity:0.55; transform:translateX(-50%); }
   }
   .hero-grid{
     position:relative; z-index:1;
@@ -211,10 +294,13 @@
   .tier-list li .check{color:var(--ok); flex-shrink:0;}
   .tier-card.featured .tier-list li .check{color:#8FD6A8;}
   .tier-cta{
-    margin-top:24px; text-align:center; padding:12px; border-radius:10px;
-    border:2px solid var(--steel); font-weight:600; font-size:0.95rem;
+    margin-top:24px; text-align:center; padding:14px 12px; border-radius:10px;
+    border:2px solid var(--steel); font-weight:600; font-size:0.95rem; color:var(--ink);
+    display:block; min-height:44px; transition:background .2s ease, transform .15s ease;
   }
-  .tier-card.featured .tier-cta{border-color:#fff; background:var(--sunset); border-color:var(--sunset);}
+  .tier-cta:hover{background:rgba(111,168,220,0.12); transform:translateY(-2px);}
+  .tier-card.featured .tier-cta{border-color:var(--sunset); background:var(--sunset); color:#fff;}
+  .tier-card.featured .tier-cta:hover{background:var(--sunset-deep);}
 
   /* ===== Scroll-scrub story ===== */
   .scrub{ position:relative; height:340vh; }
@@ -226,9 +312,11 @@
   }
   .scrub-media{
     position:relative; width:min(38vw, 380px); aspect-ratio:1/1; flex-shrink:0;
-    border-radius:20px; overflow:hidden; background:#fff; box-shadow:0 20px 50px rgba(20,33,50,0.14);
+    border-radius:20px; overflow:hidden; background:var(--paper-dim);
+    border:1px solid var(--line); box-shadow:0 20px 50px rgba(0,0,0,0.35);
   }
-  .scrub-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; }
+  .scrub-img{ position:absolute; inset:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0; }
+  .scrub-img svg{ width:62%; height:62%; }
   .scrub-copy{ max-width:360px; }
   .scrub-eyebrow{ color:var(--steel); font-weight:600; font-size:0.92rem; margin-bottom:14px; }
   .scrub-cap{ position:absolute; opacity:0; transition:opacity .25s ease; }
@@ -242,7 +330,6 @@
 
   .services{padding:86px 0; border-bottom:1px solid var(--line);}
   .section-head{max-width:560px; margin-bottom:48px;}
-  .section-head .tag{color:var(--steel); font-weight:600; font-size:0.95rem; margin-bottom:10px;}
   .section-head h2{font-size:clamp(1.6rem,3vw,2.1rem); color:var(--ink);}
   .service-pair{display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--line); border:1px solid var(--line);}
   @media (max-width:760px){ .service-pair{grid-template-columns:1fr;} }
@@ -251,10 +338,9 @@
   .service-panel.dark{background:var(--steel-deep); color:#fff;}
   .service-panel .picon{width:52px; height:52px; margin-bottom:22px;}
   .service-figure{
-    background:#fff; border-radius:12px; padding:10px; margin-bottom:22px;
-    max-width:220px; box-shadow:0 10px 24px rgba(0,0,0,0.18);
+    background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:14px; margin-bottom:22px;
+    max-width:240px; box-shadow:0 10px 24px rgba(0,0,0,0.28);
   }
-  .service-figure img{width:100%; display:block; border-radius:6px;}
   .service-panel h3{font-size:1.4rem; margin-bottom:14px;}
   .service-panel.dark h3{color:#fff;}
   .service-panel p{color:var(--muted); max-width:380px;}
@@ -272,9 +358,8 @@
   .why{padding:86px 0; border-bottom:1px solid var(--line); background:var(--paper-dim);}
   .why-figure{
     border-radius:16px; overflow:hidden; margin-bottom:44px;
-    border:1px solid var(--line); max-height:340px;
+    border:1px solid var(--line); max-height:340px; background:var(--paper);
   }
-  .why-figure img{width:100%; height:100%; object-fit:cover; display:block;}
   .why-list{display:flex; flex-direction:column;}
   .why-item{
     display:grid; grid-template-columns:220px 1fr; gap:28px;
@@ -360,7 +445,7 @@
   </div>
 </div>
 
-<header>
+<header id="siteHeader">
   <div class="headbar">
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 40 40" fill="none">
@@ -377,10 +462,37 @@
       <a href="#contact">ติดต่อ</a>
     </nav>
     <a class="call-pill" href="tel:0936695590">โทร 093-669-5590</a>
+    <button class="nav-toggle" id="navToggle" aria-label="เปิดเมนู" aria-expanded="false" aria-controls="mobileNav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="4" y1="7" x2="20" y2="7"/>
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="17" x2="20" y2="17"/>
+      </svg>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="#services">บริการ</a>
+    <a href="#why">ทำไมเลือกเรา</a>
+    <a href="#process">ขั้นตอน</a>
+    <a href="#contact">ติดต่อ</a>
+  </nav>
 </header>
 
+<a class="mobile-call-bar" href="tel:0936695590" aria-label="โทรหา iFix Pattaya 093-669-5590">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+  โทรประเมินฟรี 093-669-5590
+</a>
+
 <section class="hero">
+  <div class="hero-nebula" id="heroNebula" aria-hidden="true"></div>
+  <div class="hero-lamp" aria-hidden="true">
+    <div class="lamp-cone lamp-cone-left"></div>
+    <div class="lamp-cone lamp-cone-right"></div>
+    <div class="lamp-line"></div>
+    <div class="lamp-core"></div>
+  </div>
   <svg class="hero-circuit" viewBox="0 0 1100 500" preserveAspectRatio="none" fill="none">
     <g stroke="#6FA8DC" stroke-width="1.4" opacity="0.5">
       <path d="M0 90 H260 L300 130 H520" />
@@ -442,15 +554,44 @@
 <section class="scrub" id="scrub">
   <div class="scrub-stage">
     <div class="scrub-media">
-      <!-- Original AI-generated illustration sequence (temporary preview links) -->
-      <img class="scrub-img" data-frame="0" alt="จอมือถือแตก"
-           src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/df2e85c670acd061911ee604bf431dfc9f019046eb7f5cdbf812bc8ed0b18ed2/image.webp">
-      <img class="scrub-img" data-frame="1" alt="ถอดสกรู"
-           src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/d3204d2317b7b5f6b37cd064a1aeda42a30e370462fe10c6b3326b7c292c8ea1/image.webp">
-      <img class="scrub-img" data-frame="2" alt="เปิดฝาตรวจเช็ค"
-           src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/acfbf6973c617b8ab0a40ed4765ebd2b5c1781e932303d87e9912f1548e4c448/image.webp">
-      <img class="scrub-img" data-frame="3" alt="ใส่จอใหม่"
-           src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/e1f4b170f71fff303e60e8fb3121b70a19a23ca5bf33d9a0afa3ae6adfcf7909/image.webp">
+      <div class="scrub-img" data-frame="0" role="img" aria-label="จอมือถือแตก">
+        <svg viewBox="0 0 120 120" fill="none">
+          <rect x="38" y="10" width="44" height="100" rx="10" stroke="#6FA8DC" stroke-width="3"/>
+          <path d="M50 20 L70 45 L52 62 L74 92" stroke="#FF6A45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M46 55 L60 40 L58 78" stroke="#FF6A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="scrub-img" data-frame="1" role="img" aria-label="ถอดสกรู">
+        <svg viewBox="0 0 120 120" fill="none">
+          <rect x="38" y="10" width="44" height="100" rx="10" stroke="#6FA8DC" stroke-width="3"/>
+          <circle cx="47" cy="22" r="3.4" stroke="#6FA8DC" stroke-width="2"/>
+          <circle cx="73" cy="22" r="3.4" stroke="#6FA8DC" stroke-width="2"/>
+          <circle cx="47" cy="100" r="3.4" stroke="#6FA8DC" stroke-width="2"/>
+          <circle cx="73" cy="100" r="3.4" stroke="#6FA8DC" stroke-width="2"/>
+          <g transform="translate(84,84) rotate(45)">
+            <rect x="-4" y="-26" width="8" height="20" rx="2" fill="#FF6A45"/>
+            <rect x="-6" y="-6" width="12" height="16" rx="3" fill="#FF6A45"/>
+          </g>
+        </svg>
+      </div>
+      <div class="scrub-img" data-frame="2" role="img" aria-label="เปิดฝาตรวจเช็ค">
+        <svg viewBox="0 0 120 120" fill="none">
+          <rect x="22" y="16" width="40" height="92" rx="9" stroke="#6FA8DC" stroke-width="3" opacity="0.55"/>
+          <rect x="60" y="12" width="40" height="96" rx="9" stroke="#6FA8DC" stroke-width="3"/>
+          <rect x="70" y="30" width="20" height="14" rx="2" stroke="#FF6A45" stroke-width="2.2"/>
+          <line x1="70" y1="52" x2="90" y2="52" stroke="#FF6A45" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="70" y1="60" x2="84" y2="60" stroke="#FF6A45" stroke-width="2.2" stroke-linecap="round"/>
+          <rect x="70" y="72" width="20" height="24" rx="2" stroke="#6FA8DC" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="scrub-img" data-frame="3" role="img" aria-label="ใส่จอใหม่">
+        <svg viewBox="0 0 120 120" fill="none">
+          <rect x="38" y="10" width="44" height="100" rx="10" stroke="#6FA8DC" stroke-width="3"/>
+          <rect x="46" y="22" width="28" height="76" rx="4" fill="#16273F" stroke="#6FA8DC" stroke-width="1.6"/>
+          <path d="M60 6 L63 15 L72 18 L63 21 L60 30 L57 21 L48 18 L57 15 Z" fill="#FF6A45"/>
+          <path d="M92 30 L95 37 L102 40 L95 43 L92 50 L89 43 L82 40 L89 37 Z" fill="#FF6A45" opacity="0.7"/>
+        </svg>
+      </div>
     </div>
     <div class="scrub-copy">
       <div class="scrub-eyebrow">ขั้นตอนการซ่อมจริง</div>
@@ -464,13 +605,12 @@
 
 <section class="services" id="services">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div class="tag">บริการของเรา</div>
+    <div class="section-head">
       <h2>สองบริการหลัก เลือกได้ตามที่ต้องการ</h2>
     </div>
   </div>
   <div class="wrap">
-    <div class="service-pair reveal">
+    <div class="service-pair">
       <div class="service-panel">
         <svg class="picon" viewBox="0 0 52 52" fill="none">
           <rect x="14" y="6" width="24" height="40" rx="4" stroke="#6FA8DC" stroke-width="2.4"/>
@@ -485,11 +625,18 @@
         </ul>
       </div>
       <div class="service-panel dark">
-        <!-- Original AI-generated illustration (temporary preview link) -->
-        <div class="service-figure">
-          <img src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/2ca829b4d3bcb635347bf570b8cd38a184e8a5a181bc70ababf907ff8821c6b4/image.webp"
-               alt="รับซื้อมือถือแลกเงินสด"
-               onerror="this.parentElement.style.display='none'">
+        <div class="service-figure" role="img" aria-label="รับซื้อมือถือแลกเงินสด">
+          <svg viewBox="0 0 220 160" width="100%" fill="none">
+            <rect x="14" y="14" width="90" height="132" rx="12" stroke="#6FA8DC" stroke-width="2.4"/>
+            <line x1="30" y1="34" x2="88" y2="34" stroke="#6FA8DC" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="59" cy="132" r="6" stroke="#6FA8DC" stroke-width="2.4"/>
+            <g>
+              <circle cx="150" cy="80" r="42" fill="#0F1728" stroke="#FF6A45" stroke-width="2.6"/>
+              <circle cx="150" cy="80" r="30" stroke="#FF9B7E" stroke-width="1.6" opacity="0.6"/>
+              <path d="M150 60 V100 M140 68 Q150 60 160 68 M140 92 Q150 100 160 92" stroke="#FF6A45" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+              <path d="M96 80 H108 M192 80 H204 M150 26 V38 M150 122 V134" stroke="#FF6A45" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            </g>
+          </svg>
         </div>
         <svg class="picon" viewBox="0 0 52 52" fill="none">
           <circle cx="26" cy="26" r="18" stroke="#FF9B7E" stroke-width="2.4"/>
@@ -509,17 +656,27 @@
 
 <section class="why" id="why">
   <div class="wrap">
-    <!-- Original AI-generated illustration (temporary preview link — replace with a permanently hosted copy before going live) -->
-    <div class="why-figure reveal">
-      <img src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/f13a054c968eb89cbbc7e5c8f98692a52980456b9bfee1b500faf7339b032c78/image.webp"
-           alt="ช่างกำลังซ่อมมือถือด้วยไขควง"
-           onerror="this.parentElement.style.display='none'">
+    <div class="why-figure" role="img" aria-label="ช่างกำลังซ่อมมือถือด้วยไขควง">
+      <svg viewBox="0 0 1100 340" width="100%" preserveAspectRatio="xMidYMid slice" fill="none">
+        <g stroke="#3A6EA5" stroke-width="1" opacity="0.35">
+          <path d="M0 60 H1100 M0 170 H1100 M0 280 H1100"/>
+        </g>
+        <rect x="470" y="70" width="160" height="200" rx="18" stroke="#6FA8DC" stroke-width="3"/>
+        <rect x="486" y="94" width="128" height="150" rx="6" fill="#0F1728" stroke="#3A6EA5" stroke-width="1.4"/>
+        <circle cx="550" cy="256" r="7" stroke="#6FA8DC" stroke-width="2.4"/>
+        <path d="M486 150 H614" stroke="#FF6A45" stroke-width="2" opacity="0.6"/>
+        <g transform="translate(630,190) rotate(28)">
+          <rect x="-5" y="-64" width="10" height="46" rx="3" fill="#FF6A45"/>
+          <path d="M-9 -18 L9 -18 L0 4 Z" fill="#FF9B7E"/>
+        </g>
+        <circle cx="612" cy="150" r="5" fill="#FF6A45" style="animation:pulseDot 2.6s ease-in-out infinite;"/>
+        <circle cx="500" cy="230" r="4" fill="#FF6A45" style="animation:pulseDot 3.1s ease-in-out .5s infinite;"/>
+      </svg>
     </div>
-    <div class="section-head reveal">
-      <div class="tag">ทำไมเลือกเรา</div>
+    <div class="section-head">
       <h2>ไม่ได้ถูกที่สุด แต่วางใจได้ที่สุด</h2>
     </div>
-    <div class="why-list reveal">
+    <div class="why-list">
       <div class="why-item">
         <h3>อะไหล่คุณภาพดี</h3>
         <p>คัดอะไหล่ที่ผ่านการทดสอบก่อนใช้งานจริงทุกชิ้น ไม่ใช้ของเกรดต่ำเพื่อกดราคา</p>
@@ -542,8 +699,7 @@
 
 <section class="process" id="process">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div class="tag">ขั้นตอนการใช้บริการ</div>
+    <div class="section-head">
       <h2>ง่ายๆ 4 ขั้นตอน ไม่ยุ่งยาก</h2>
     </div>
     <div class="steps reveal-stagger">
@@ -572,11 +728,10 @@
 </section>
 
 <section class="area">
-  <div class="wrap area-grid reveal">
+  <div class="wrap area-grid">
     <div>
       <div class="section-head" style="margin-bottom:0;">
-        <div class="tag">พื้นที่ให้บริการ</div>
-        <h2>พัทยา - ห้วยใหญ่ และใกล้เคียง</h2>
+        <h2>ให้บริการทั่วพัทยา - ห้วยใหญ่ และใกล้เคียง</h2>
       </div>
       <p>บริการรับ-ส่งถึงบ้านในเขตพัทยาและห้วยใหญ่ สำหรับงานซ่อมนอกพื้นที่รับส่งทางไปรษณีย์ได้เช่นกัน</p>
       <div class="area-tags">
@@ -598,13 +753,12 @@
 
 <section class="tiers" id="tiers">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div class="tag">แพ็กเกจดูแลเครื่อง</div>
+    <div class="section-head">
       <h2>เลือกระดับการดูแลที่เหมาะกับคุณ</h2>
     </div>
   </div>
   <div class="wrap">
-    <div class="tier-grid reveal">
+    <div class="tier-grid">
       <div class="tier-card">
         <div class="tier-eyebrow">ทั่วไป</div>
         <h3>ซ่อมทั่วไป</h3>
@@ -614,7 +768,7 @@
           <li><span class="check">✓</span>รับประกันงานซ่อม 30 วัน</li>
           <li><span class="check">✓</span>ประเมินราคาฟรี</li>
         </ul>
-        <div class="tier-cta">เลือกแบบนี้</div>
+        <a class="tier-cta" href="tel:0936695590">เลือกแบบนี้</a>
       </div>
       <div class="tier-card featured">
         <div class="tier-eyebrow">แนะนำ</div>
@@ -626,7 +780,7 @@
           <li><span class="check">✓</span>ทำความสะอาดเครื่องฟรี</li>
           <li><span class="check">✓</span>ตรวจเช็คแบตเตอรี่ให้ฟรี</li>
         </ul>
-        <div class="tier-cta">เลือกแบบนี้</div>
+        <a class="tier-cta" href="tel:0936695590">เลือกแบบนี้</a>
       </div>
       <div class="tier-card">
         <div class="tier-eyebrow">ลูกค้าประจำ</div>
@@ -638,20 +792,25 @@
           <li><span class="check">✓</span>ส่วนลดค่าแรงครั้งถัดไป</li>
           <li><span class="check">✓</span>แจ้งเตือนดูแลเครื่องทุก 6 เดือน</li>
         </ul>
-        <div class="tier-cta">เลือกแบบนี้</div>
+        <a class="tier-cta" href="tel:0936695590">เลือกแบบนี้</a>
       </div>
     </div>
   </div>
 </section>
 
 <section class="final-cta" id="contact">
-  <!-- Original AI-generated illustration (temporary preview link) -->
-  <div class="final-cta-art">
-    <img src="https://mcp-tools-z-image-turbo.hf.space/--replicas/twg5d/gradio_api/file=/tmp/gradio/fd3c5f71f7fcf20fbd00a745c495669a89edf1610dc8b04a07999a7ac6bd7323/image.webp"
-         alt=""
-         onerror="this.parentElement.style.display='none'">
+  <div class="final-cta-art" aria-hidden="true">
+    <svg viewBox="0 0 480 480" fill="none">
+      <circle cx="240" cy="240" r="180" stroke="#fff" stroke-width="1.4" opacity="0.25"/>
+      <circle cx="240" cy="240" r="130" stroke="#FF6A45" stroke-width="1.6" opacity="0.4"/>
+      <rect x="185" y="120" width="110" height="240" rx="22" stroke="#fff" stroke-width="3" opacity="0.85"/>
+      <line x1="205" y1="146" x2="255" y2="146" stroke="#FF6A45" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="240" cy="338" r="9" stroke="#fff" stroke-width="2.6" opacity="0.85"/>
+      <circle cx="130" cy="150" r="5" fill="#FF6A45" style="animation:pulseDot 3s ease-in-out infinite;"/>
+      <circle cx="360" cy="330" r="5" fill="#FF6A45" style="animation:pulseDot 3.4s ease-in-out .6s infinite;"/>
+    </svg>
   </div>
-  <div class="wrap reveal">
+  <div class="wrap">
     <h2>อยากซ่อมหรือขายซาก iPhone วันนี้เลยไหม?</h2>
     <p>โทรมาแจ้งอาการเครื่องได้เลย ประเมินราคาฟรี นัดรับได้ทั้งพัทยาและห้วยใหญ่</p>
     <div class="cta-row">
@@ -667,6 +826,90 @@
     <span>พัทยา - ห้วยใหญ่ · โทร 093-669-5590</span>
   </div>
 </footer>
+
+<script>
+  (function(){
+    var container = document.getElementById('heroNebula');
+    if(!container || typeof THREE === 'undefined') return;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion) return; /* hero already has a static gradient background as fallback */
+
+    var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    container.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var clock = new THREE.Clock();
+
+    var vertexShader = [
+      'varying vec2 vUv;',
+      'void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }'
+    ].join('\n');
+
+    /* Soft drifting glow blobs, in the iFix Pattaya palette (steel blue + sunset orange) */
+    var fragmentShader = [
+      'precision mediump float;',
+      'uniform vec2 iResolution;',
+      'uniform float iTime;',
+      'varying vec2 vUv;',
+      'float blob(vec2 uv, vec2 c, float r){',
+      '  float d = length(uv - c);',
+      '  return pow(smoothstep(r, 0.0, d), 1.7);', /* concentrated core, soft falloff */
+      '}',
+      'void main(){',
+      '  float asp = iResolution.x / iResolution.y;',
+      '  vec2 uv = vUv; uv.x *= asp;',
+      '  vec2 p1 = vec2((0.18 + 0.06*sin(iTime*0.22)) * asp, 0.10 + 0.05*cos(iTime*0.18));',
+      '  vec2 p2 = vec2((0.88 + 0.05*cos(iTime*0.16)) * asp, 0.82 + 0.06*sin(iTime*0.27));',
+      '  vec2 p3 = vec2((0.80 + 0.05*sin(iTime*0.14 + 2.0)) * asp, 0.34 + 0.06*cos(iTime*0.20 + 1.0));',
+      '  float b1 = blob(uv, p1, 0.62);',
+      '  float b2 = blob(uv, p2, 0.56);',
+      '  float b3 = blob(uv, p3, 0.46);',
+      '  vec3 steel = vec3(0.53, 0.73, 0.96);',
+      '  vec3 sunset = vec3(1.0, 0.46, 0.3);',
+      '  vec3 col = steel*b1*1.15 + steel*b2*0.85 + sunset*b3*1.05;',
+      '  float alpha = clamp(b1 + b2*0.85 + b3*0.9, 0.0, 1.0);',
+      '  gl_FragColor = vec4(col, alpha);',
+      '}'
+    ].join('\n');
+
+    var uniforms = {
+      iTime: { value: 0 },
+      iResolution: { value: new THREE.Vector2() }
+    };
+    var material = new THREE.ShaderMaterial({
+      vertexShader:vertexShader, fragmentShader:fragmentShader, uniforms:uniforms,
+      transparent:true, depthWrite:false, blending:THREE.AdditiveBlending
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function sizeRenderer(){
+      var w = container.clientWidth, h = container.clientHeight;
+      renderer.setSize(w, h);
+      uniforms.iResolution.value.set(w, h);
+    }
+    sizeRenderer();
+    window.addEventListener('resize', sizeRenderer);
+
+    /* pause the ray-march once the hero scrolls out of view to save battery/GPU */
+    var running = true;
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){ running = entries[0].isIntersecting; }).observe(container);
+    }
+    document.addEventListener('visibilitychange', function(){ if(document.hidden) running = false; });
+
+    function loop(){
+      if(running){
+        uniforms.iTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    window.__nebulaDebug.started = true;
+  })();
+</script>
 
 <script>
   (function(){
@@ -950,7 +1193,30 @@
 
 <script>
   (function(){
-    var targets = document.querySelectorAll('.reveal, .reveal-stagger');
+    var header = document.getElementById('siteHeader');
+    var toggle = document.getElementById('navToggle');
+    var mobileNav = document.getElementById('mobileNav');
+    if(!header || !toggle || !mobileNav) return;
+    function closeNav(){
+      header.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    toggle.addEventListener('click', function(){
+      var open = header.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    mobileNav.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeNav);
+    });
+    window.addEventListener('resize', function(){
+      if(window.innerWidth > 720) closeNav();
+    });
+  })();
+</script>
+
+<script>
+  (function(){
+    var targets = document.querySelectorAll('.reveal-stagger');
     if(!('IntersectionObserver' in window)){
       targets.forEach(function(el){ el.classList.add('in-view'); });
       return;
